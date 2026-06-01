@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CashFlow OS | ניהול תזרים מזומנים חכם</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="CashFlow OS - אפליקציית מובייל עצמאית לניהול תזרים מזומנים אישי, מעקב תקציב ותחזית יתרה עתידית בדיוק מירבי.">
+  <meta name="theme-color" content="#0a0b0e">
+  
+  <!-- Bootstrap Icons for premium vector icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Premium Ambient Background Blobs for Tablet/Web -->
+  <div class="ambient-glow">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Main Mobile App Shell -->
+  <div class="app-container">
+    
+    <!-- Top Header Bar -->
+    <header class="app-header">
+      <div class="logo-section">
+        <span>OS</span>
+        <h1>CashFlow</h1>
+      </div>
+      <div class="header-actions">
+        <div class="month-switcher" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); padding: 4px 10px; border-radius: 12px;">
+          <button id="btn-prev-month" class="icon-btn" style="width: 28px; height: 28px; border-radius: 8px; font-size: 0.8rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><i class="bi bi-chevron-right"></i></button>
+          <span id="selected-month-label" style="font-size: 0.85rem; font-weight: 700; color: white; min-width: 75px; text-align: center;">יוני 2026</span>
+          <button id="btn-next-month" class="icon-btn" style="width: 28px; height: 28px; border-radius: 8px; font-size: 0.8rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;"><i class="bi bi-chevron-left"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- App Main Scrollable Panel -->
+    <main class="app-content" id="main-content">
+      
+      <!-- TOAST NOTIFICATION SYSTEM -->
+      <div id="app-toast" class="toast">העסקה נשמרה בהצלחה</div>
+
+      <!-- ==================== SCREEN 1: TIMELINE (ציר זמן & דאשבורד) ==================== -->
+      <div id="screen-timeline" class="screen-section">
+        
+        <!-- Current Account Balances Dashboard -->
+        <div class="balance-section">
+          <span class="balance-title">יתרה נוכחית בעו"ש</span>
+          <div class="balance-value">
+            <span id="current-balance-value">0</span>
+            <span class="balance-currency">₪</span>
+          </div>
+          
+          <div style="display: flex; justify-content: center; gap: 16px; margin-top: 8px;">
+            <div style="display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); padding: 6px 16px; border-radius: 12px;">
+              <span style="font-size: 0.68rem; color: var(--text-secondary);">צפי לסוף חודש</span>
+              <span id="projected-balance-value" style="font-size: 0.95rem; font-weight: 700; font-family: var(--font-display);">0 ₪</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projection Chart Card -->
+        <div class="glass-card slide-up-anim">
+          <div class="chart-header">
+            <span class="chart-title">תחזית יתרה 30 יום קדימה</span>
+            <span class="chart-meta">כולל הוראות קבע</span>
+          </div>
+          <div class="chart-container" id="projection-chart-container">
+            <!-- Dynamic SVG will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Upcoming Bills Section -->
+        <div class="section-header slide-up-anim">
+          <span class="section-title">חיובים קבועים קרובים</span>
+        </div>
+        <div class="glass-card slide-up-anim" style="padding: 14px;">
+          <div id="upcoming-list-container" class="upcoming-list">
+            <!-- Dynamic upcoming recurring events will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Recent Transactions Timeline -->
+        <div class="section-header slide-up-anim">
+          <span class="section-title">תנועות ועסקאות אחרונות</span>
+        </div>
+        <div id="timeline-container" class="timeline-section">
+          <!-- Dynamic transaction timeline will be rendered here -->
+        </div>
+
+      </div>
+
+      <!-- ==================== SCREEN 2: REPORTS (דוחות ותקציבים) ==================== -->
+      <div id="screen-reports" class="screen-section hidden">
+        
+
+        <!-- Monthly Net Performance Cards -->
+        <div class="reports-grid">
+          <div class="summary-cards-container slide-up-anim">
+            <div class="mini-card inflow">
+              <span class="mini-card-title">הכנסות חודש זה</span>
+              <div id="report-income-val" class="mini-card-value">+0 ₪</div>
+            </div>
+            <div class="mini-card outflow">
+              <span class="mini-card-title">הוצאות חודש זה</span>
+              <div id="report-expense-val" class="mini-card-value">-0 ₪</div>
+            </div>
+          </div>
+
+          <div class="glass-card slide-up-anim" style="margin-bottom: 0;">
+            <span class="mini-card-title">תזרים נטו (רווח/הפסד)</span>
+            <div id="report-net-val" class="mini-card-value">0 ₪</div>
+          </div>
+
+          <!-- Budget Split Distribution Card (Needs / Wants / Savings) -->
+          <div class="glass-card slide-up-anim" style="margin-bottom: 0;">
+            <div class="chart-header" style="margin-bottom: 12px;">
+              <span class="chart-title">חלוקת תקציב בפועל (Needs / Wants / Savings)</span>
+              <span class="chart-meta">יעד מומלץ: 50% / 30% / 20%</span>
+            </div>
+            
+            <!-- Stacked distribution bar -->
+            <div style="width: 100%; height: 20px; border-radius: 10px; display: flex; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); margin-bottom: 16px;">
+              <div id="split-bar-needs" style="height: 100%; width: 0%; background: linear-gradient(135deg, #00b4d8 0%, #5d5fe6 100%); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: white;"></div>
+              <div id="split-bar-wants" style="height: 100%; width: 0%; background: linear-gradient(135deg, #ff4a5a 0%, #ff7a00 100%); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: white;"></div>
+              <div id="split-bar-savings" style="height: 100%; width: 0%; background: linear-gradient(135deg, #00f0a8 0%, #00b4d8 100%); transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: #05140f;"></div>
+            </div>
+            
+            <!-- Detailed breakdown list -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: #5d5fe6;"></span>
+                  <span style="font-weight: 600;">הוצאות מחיה (Needs)</span>
+                </div>
+                <span id="split-text-needs" style="color: var(--text-secondary);">0 ₪ (0%)</span>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: #ff4a5a;"></span>
+                  <span style="font-weight: 600;">בזבוזים ופנאי (Wants)</span>
+                </div>
+                <span id="split-text-wants" style="color: var(--text-secondary);">0 ₪ (0%)</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: #00f0a8;"></span>
+                  <span style="font-weight: 600;">חיסכון והשקעות (Savings)</span>
+                </div>
+                <span id="split-text-savings" style="color: var(--text-secondary);">0 ₪ (0%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget vs Actual Progress Section -->
+          <div class="section-header slide-up-anim" style="margin-top: 10px; margin-bottom: 8px;">
+            <span class="section-title">תקציב מול ביצוע (חודשי)</span>
+          </div>
+          <div class="glass-card slide-up-anim">
+            <div id="reports-budget-progress-container" class="budget-progress-list">
+              <!-- Dynamic category budget bars will be rendered here -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== SCREEN 3: SETTINGS (הגדרות וכלי מערכת) ==================== -->
+      <div id="screen-settings" class="screen-section hidden">
+        
+        <div class="section-header slide-up-anim">
+          <span class="section-title">הגדרות חשבון</span>
+        </div>
+
+        <!-- Cash Settings -->
+        <div class="glass-card settings-section slide-up-anim">
+          <div class="settings-row">
+            <label for="setting-starting-cash">יתרת פתיחה לחודש בעו"ש</label>
+            <input type="number" id="setting-starting-cash" class="settings-input" value="4500">
+          </div>
+        </div>
+
+        <!-- Recurring Transactions List Manager -->
+        <div class="section-header slide-up-anim" style="margin-top: 10px;">
+          <span class="section-title">הוראות קבע מוגדרות</span>
+          <span id="btn-add-recurring" class="section-link"><i class="bi bi-plus-lg"></i> הוסף הוראת קבע</span>
+        </div>
+        <div class="glass-card slide-up-anim" style="padding: 14px;">
+          <div id="settings-recurring-list" class="timeline-section">
+            <!-- Dynamic recurring items list will render here -->
+          </div>
+        </div>
+
+        <!-- Categories List Manager -->
+        <div class="section-header slide-up-anim" style="margin-top: 10px;">
+          <span class="section-title">ניהול קטגוריות ותקציבים</span>
+          <span id="btn-add-category" class="section-link"><i class="bi bi-plus-lg"></i> הוסף קטגוריה</span>
+        </div>
+        <div class="glass-card slide-up-anim" style="padding: 14px;">
+          <div id="settings-categories-list" class="timeline-section">
+            <!-- Dynamic categories list will render here -->
+          </div>
+        </div>
+
+        <!-- CSV Tools -->
+        <div class="section-header slide-up-anim" style="margin-top: 10px;">
+          <span class="section-title">ניהול וגיבוי נתונים</span>
+        </div>
+        <div class="glass-card slide-up-anim" style="display: flex; flex-direction: column; gap: 12px;">
+          <button id="btn-export-csv" class="btn-secondary">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            ייצוא עסקאות ל-CSV
+          </button>
+          
+          <label for="csv-import-file" class="btn-secondary" style="cursor: pointer; margin: 0;">
+            <i class="bi bi-file-earmark-arrow-up"></i>
+            ייבוא עסקאות מ-CSV
+          </label>
+          <input type="file" id="csv-import-file" accept=".csv" class="hidden">
+        </div>
+
+        <!-- Danger Zone Reset -->
+        <div class="section-header slide-up-anim" style="margin-top: 10px;">
+          <span class="section-title">אזור מוגן</span>
+        </div>
+        <div class="glass-card slide-up-anim">
+          <button id="btn-reset-data" class="btn-danger">
+            <i class="bi bi-trash3"></i>
+            מחיקת כל הנתונים ואיפוס מערכת
+          </button>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-tab="timeline">
+        <i class="bi bi-activity"></i>
+        <span>ציר זמן</span>
+      </div>
+      
+      <!-- Central Action Floating Action Button (FAB) -->
+      <div class="nav-item nav-item-fab" data-tab="action">
+        <button class="fab-btn" id="fab-trigger">
+          <i class="bi bi-plus"></i>
+        </button>
+      </div>
+      
+      <div class="nav-item" data-tab="reports">
+        <i class="bi bi-pie-chart"></i>
+        <span>דוחות</span>
+      </div>
+
+      <div class="nav-item" data-tab="settings">
+        <i class="bi bi-sliders"></i>
+        <span>הגדרות</span>
+      </div>
+    </nav>
+
+    <!-- ==================== FLOATING CUSTOM NUMPAD OVERLAY ==================== -->
+    <div id="numpad-overlay" class="numpad-overlay hidden">
+      <div class="numpad-drawer">
+        
+        <div class="numpad-header">
+          <span class="numpad-title" id="numpad-title">הזנת תנועה מהירה</span>
+          <button class="numpad-close" id="numpad-close"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <!-- Custom Numpad Screen -->
+        <div class="numpad-screen-container">
+          <input type="hidden" id="numpad-edit-id">
+          <div class="type-toggle-pill" id="numpad-type-toggle">
+            <div class="type-pill active expense" data-type="expense">הוצאה</div>
+            <div class="type-pill income" data-type="income">הכנסה</div>
+          </div>
+          
+          <div class="numpad-amount-display">
+            <span id="numpad-amount-text">0</span>
+            <span class="numpad-currency">₪</span>
+          </div>
+
+          <input type="text" id="numpad-note" class="numpad-note-input" placeholder="הוסף הערה לעסקה (למשל: סופרסל, תדלוק...)" dir="rtl">
+        </div>
+
+        <!-- Date Selector Row -->
+        <span class="category-picker-label">תאריך העסקה:</span>
+        <div class="date-selector-row" style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button type="button" class="btn-date-select active" id="btn-date-today" style="flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.05); color: white; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">היום</button>
+          <button type="button" class="btn-date-select" id="btn-date-yesterday" style="flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02); color: var(--text-secondary); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">אתמול</button>
+          <div class="custom-date-wrapper" style="flex: 1.5; position: relative; display: flex; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 10px; padding: 0 8px;">
+            <i class="bi bi-calendar-event" style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 6px;"></i>
+            <input type="date" id="numpad-custom-date" style="background: transparent; border: none; color: white; font-family: var(--font-body); font-size: 0.78rem; outline: none; width: 100%; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- Category Horizontal Scroll Picker -->
+        <span class="category-picker-label">בחר קטגוריה:</span>
+        <div id="numpad-category-picker" class="category-picker-scroll">
+          <!-- Categories list generated dynamically here -->
+        </div>
+
+        <!-- Keyboard Keypad -->
+        <div class="keyboard-grid">
+          <div class="key" data-value="1">1</div>
+          <div class="key" data-value="2">2</div>
+          <div class="key" data-value="3">3</div>
+          <div class="key" data-value="4">4</div>
+          <div class="key" data-value="5">5</div>
+          <div class="key" data-value="6">6</div>
+          <div class="key" data-value="7">7</div>
+          <div class="key" data-value="8">8</div>
+          <div class="key" data-value="9">9</div>
+          <div class="key key-op" data-value=".">.</div>
+          <div class="key" data-value="0">0</div>
+          <div class="key key-op" data-value="backspace"><i class="bi bi-backspace"></i></div>
+          
+          <button class="key-submit" id="numpad-submit">
+            שמור עסקה
+            <i class="bi bi-check2-circle"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== MODAL: ADD RECURRING ITEM ==================== -->
+    <div id="recurring-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="recurring-modal-title">הוספת הוראת קבע חדשה</span>
+          <button class="modal-close" id="recurring-modal-close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="recurring-form">
+          <input type="hidden" id="recurring-edit-id">
+          <div class="form-group">
+            <label for="rec-name">שם הוראת הקבע</label>
+            <input type="text" id="rec-name" class="form-input" placeholder="לדוגמא: נטפליקס, שכר דירה" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rec-amount">סכום (₪)</label>
+              <input type="number" id="rec-amount" class="form-input" placeholder="סכום" required min="1" step="any">
+            </div>
+            <div class="form-group">
+              <label for="rec-type">סוג תזרים</label>
+              <select id="rec-type" class="form-input">
+                <option value="expense">הוצאה קבועה</option>
+                <option value="income">הכנסה קבועה</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rec-day">יום בחודש לביצוע (1-31)</label>
+              <input type="number" id="rec-day" class="form-input" placeholder="למשל: 10" required min="1" max="31">
+            </div>
+            <div class="form-group">
+              <label for="rec-category">קטגוריה</label>
+              <select id="rec-category" class="form-input">
+                <!-- Dropdown options populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn-primary">שמור הוראת קבע</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL: ADD/EDIT CATEGORY ==================== -->
+    <div id="category-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="category-modal-title">הוספת קטגוריה חדשה</span>
+          <button class="modal-close" id="category-modal-close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="category-form">
+          <input type="hidden" id="category-edit-id">
+          <div class="form-group">
+            <label for="cat-name">שם הקטגוריה</label>
+            <input type="text" id="cat-name" class="form-input" placeholder="לדוגמא: מתנות, ביטוח" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="cat-bucket">סיווג תקציבי</label>
+            <select id="cat-bucket" class="form-input">
+              <option value="needs">מחיה והוצאות הכרחיות (Needs)</option>
+              <option value="wants">בזבוזים ופנאי (Wants)</option>
+              <option value="savings">חיסכון והשקעות (Savings/Investments)</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cat-icon">אייקון (אמוג'י)</label>
+              <input type="text" id="cat-icon" class="form-input" placeholder="לדוגמא: 🎁" required style="font-size: 1.25rem; text-align: center;">
+            </div>
+            <div class="form-group">
+              <label for="cat-limit">תקציב חודשי (0 = ללא מגבלה)</label>
+              <input type="number" id="cat-limit" class="form-input" placeholder="תקציב" min="0" value="0">
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn-primary">שמור קטגוריה</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Boot module script -->
+  <script type="module" src="app.js"></script>
+  
+  <script>
+    // Inline quick script to display today's date in Hebrew format in header
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateEl = document.getElementById('header-today-date');
+      if (dateEl) {
+        const today = new Date();
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        dateEl.innerText = today.toLocaleDateString('he-IL', options);
+      }
+    });
+  </script>
+</body>
+</html>

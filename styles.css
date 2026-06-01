@@ -1399,31 +1399,76 @@ input:checked + .slider:before {
 /* Responsive keyboard height sizing for small screen heights or open mobile keyboard */
 @media (max-height: 700px) {
   .numpad-drawer {
-    padding: 16px 20px;
+    padding: 10px 16px;
+  }
+  .numpad-header {
+    margin-bottom: 8px;
   }
   .numpad-amount-display {
-    font-size: 2.1rem;
-    margin-top: 16px;
+    font-size: 1.6rem;
+    margin-top: 8px;
   }
   .numpad-screen-container {
-    padding: 10px 16px;
-    margin-bottom: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+  }
+  .numpad-note-input {
+    margin-top: 4px;
+    padding-top: 4px;
+    font-size: 0.78rem;
+  }
+  .category-picker-label {
+    font-size: 0.72rem;
+    margin-bottom: 2px;
   }
   .category-picker-scroll {
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+  .category-pill-select {
+    padding: 4px 10px;
+    min-width: 58px;
+    border-radius: 8px;
+  }
+  .category-pill-select .cat-icon {
+    font-size: 1.05rem;
+  }
+  .category-pill-select .cat-name {
+    font-size: 0.65rem;
   }
   .date-selector-row {
-    margin-bottom: 12px !important;
+    margin-bottom: 8px !important;
+    gap: 6px !important;
+  }
+  .btn-date-select {
+    padding: 6px !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+  .custom-date-wrapper {
+    border-radius: 8px !important;
+    padding: 0 6px !important;
+  }
+  .custom-date-wrapper input {
+    font-size: 0.72rem !important;
+  }
+  .keyboard-grid {
+    gap: 6px;
+    margin-bottom: 6px;
   }
   .key {
-    height: 44px;
-    font-size: 1.25rem;
-    border-radius: 10px;
+    height: 34px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+  }
+  .key-op {
+    font-size: 0.9rem;
   }
   .key-submit {
-    height: 46px;
-    font-size: 0.9rem;
+    height: 36px;
+    font-size: 0.85rem;
+    border-radius: 8px;
     margin-top: 2px;
   }
 }

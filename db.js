@@ -4,8 +4,16 @@ const DB_KEYS = {
   CATEGORIES: 'cf_categories',
   TRANSACTIONS: 'cf_transactions',
   RECURRING: 'cf_recurring',
-  STARTING_CASH: 'cf_starting_cash'
+  STARTING_CASH: 'cf_starting_cash',
+  ASSETS: 'cf_assets'
 };
+
+// Default assets with initial value of 0 ₪
+const DEFAULT_ASSETS = [
+  { id: 'asset_portfolio', name: 'תיק השקעות עצמאי', icon: '📈', value: 0 },
+  { id: 'asset_pension', name: 'פנסיה', icon: '👵', value: 0 },
+  { id: 'asset_study', name: 'קרן השתלמות', icon: '🎓', value: 0 }
+];
 
 // Default categories with financial buckets (Needs, Wants, Savings)
 const DEFAULT_CATEGORIES = [
@@ -32,6 +40,9 @@ export const db = {
     }
     if (!localStorage.getItem(DB_KEYS.TRANSACTIONS)) {
       localStorage.setItem(DB_KEYS.TRANSACTIONS, JSON.stringify([])); // Empty default transactions list
+    }
+    if (!localStorage.getItem(DB_KEYS.ASSETS)) {
+      localStorage.setItem(DB_KEYS.ASSETS, JSON.stringify(DEFAULT_ASSETS));
     }
   },
 
@@ -487,11 +498,40 @@ export const db = {
     return mapped.sort((a, b) => a.daysRemaining - b.daysRemaining).slice(0, limit);
   },
 
+  // --- Assets (נכסים) ---
+  getAssets() {
+    return JSON.parse(localStorage.getItem(DB_KEYS.ASSETS)) || [];
+  },
+
+  saveAsset(asset) {
+    const assets = this.getAssets();
+    const index = assets.findIndex(a => a.id === asset.id);
+    if (index > -1) {
+      assets[index] = asset;
+    } else {
+      assets.push(asset);
+    }
+    localStorage.setItem(DB_KEYS.ASSETS, JSON.stringify(assets));
+    return asset;
+  },
+
+  deleteAsset(id) {
+    let assets = this.getAssets();
+    assets = assets.filter(a => a.id !== id);
+    localStorage.setItem(DB_KEYS.ASSETS, JSON.stringify(assets));
+  },
+
+  getTotalAssetsValue() {
+    const assets = this.getAssets();
+    return assets.reduce((sum, a) => sum + (parseFloat(a.value) || 0), 0);
+  },
+
   // Reset database to default empty state
   resetAll() {
     localStorage.removeItem(DB_KEYS.CATEGORIES);
     localStorage.removeItem(DB_KEYS.TRANSACTIONS);
     localStorage.removeItem(DB_KEYS.RECURRING);
+    localStorage.removeItem(DB_KEYS.ASSETS);
     
     // Clear all starting cash keys
     Object.keys(localStorage).forEach(key => {

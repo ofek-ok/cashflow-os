@@ -666,7 +666,7 @@ input:checked + .slider:before {
   border-top: 1px solid var(--panel-border);
   border-top-left-radius: 36px;
   border-top-right-radius: 36px;
-  padding: 24px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   transform: translateY(100%);
@@ -691,17 +691,17 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .numpad-title {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .numpad-close {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
   border: none;
@@ -709,7 +709,7 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
@@ -717,9 +717,9 @@ input:checked + .slider:before {
 .numpad-screen-container {
   background: rgba(0,0,0,0.2);
   border: 1px solid var(--panel-border);
-  border-radius: 20px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -728,19 +728,19 @@ input:checked + .slider:before {
 
 .type-toggle-pill {
   position: absolute;
-  top: 12px;
-  left: 16px;
+  top: 10px;
+  left: 14px;
   display: flex;
   background: rgba(255,255,255,0.05);
-  padding: 3px;
-  border-radius: 10px;
+  padding: 2.5px;
+  border-radius: 8px;
   gap: 2px;
 }
 
 .type-pill {
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-fast);
@@ -760,10 +760,10 @@ input:checked + .slider:before {
 
 .numpad-amount-display {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin-top: 24px;
+  margin-top: 16px;
   direction: ltr; /* keep number left-aligned in RTL layout */
   display: flex;
   align-items: baseline;
@@ -781,11 +781,11 @@ input:checked + .slider:before {
   background: transparent;
   border: none;
   border-top: 1px solid rgba(255,255,255,0.05);
-  margin-top: 12px;
-  padding-top: 10px;
+  margin-top: 6px;
+  padding-top: 6px;
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   outline: none;
 }
 
@@ -795,18 +795,18 @@ input:checked + .slider:before {
 
 /* Category Grid/Selector in Keypad Screen */
 .category-picker-label {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   display: block;
 }
 
 .category-picker-scroll {
   overflow-x: auto;
   display: flex;
-  gap: 12px;
-  padding-bottom: 16px;
-  margin-bottom: 20px;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
   -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
 }
 
@@ -824,22 +824,22 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 4px;
+  padding: 6px 12px;
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
+  border-radius: 12px;
   cursor: pointer;
   transition: var(--transition-fast);
-  min-width: 70px;
+  min-width: 64px;
 }
 
 .category-pill-select .cat-icon {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 .category-pill-select .cat-name {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -847,7 +847,7 @@ input:checked + .slider:before {
 .category-pill-select.active {
   background: rgba(93, 95, 230, 0.1);
   border-color: var(--primary);
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 .category-pill-select.active .cat-name {
@@ -859,18 +859,18 @@ input:checked + .slider:before {
 .keyboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .key {
-  height: 52px;
-  border-radius: 14px;
+  height: 42px;
+  border-radius: 10px;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.02);
   color: var(--text-primary);
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -890,21 +890,21 @@ input:checked + .slider:before {
 
 .key-op {
   background: rgba(255, 255, 255, 0.05);
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text-secondary);
 }
 
 .key-submit {
   width: 100%;
   box-sizing: border-box;
-  height: 54px;
-  border-radius: 14px;
+  height: 44px;
+  border-radius: 10px;
   background: var(--primary-gradient);
   color: white;
   border: none;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-top: 4px;
+  margin-top: 2px;
   box-shadow: 0 4px 15px rgba(93, 95, 230, 0.3);
   display: flex;
   align-items: center;

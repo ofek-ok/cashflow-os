@@ -97,6 +97,47 @@
 
       </div>
 
+      <!-- ==================== SCREEN 4: ASSETS (נכסים ומאזן) ==================== -->
+      <div id="screen-assets" class="screen-section hidden">
+        
+        <!-- Total Assets Balance Card -->
+        <div class="balance-section">
+          <span class="balance-title">סך כל הנכסים</span>
+          <div class="balance-value">
+            <span id="total-assets-value">0</span>
+            <span class="balance-currency">₪</span>
+          </div>
+        </div>
+
+        <!-- Asset Allocation Card -->
+        <div class="glass-card slide-up-anim">
+          <div class="chart-header" style="margin-bottom: 12px;">
+            <span class="chart-title">התפלגות נכסים</span>
+            <span class="chart-meta" id="asset-allocation-meta">חישוב לפי קטגוריה</span>
+          </div>
+          <!-- Stacked allocation bar -->
+          <div id="asset-allocation-bar" style="width: 100%; height: 16px; border-radius: 8px; display: flex; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); margin-bottom: 8px;">
+            <!-- Allocation slots will be rendered dynamically -->
+          </div>
+          <!-- Legend list -->
+          <div id="asset-allocation-legend" style="display: flex; flex-wrap: wrap; gap: 12px 16px; font-size: 0.78rem; margin-top: 12px;">
+            <!-- Legend items rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Assets List Manager -->
+        <div class="section-header slide-up-anim" style="margin-top: 10px;">
+          <span class="section-title">פירוט נכסים</span>
+          <span id="btn-add-asset" class="section-link"><i class="bi bi-plus-lg"></i> הוסף נכס</span>
+        </div>
+        <div class="glass-card slide-up-anim" style="padding: 14px;">
+          <div id="assets-list-container" class="timeline-section">
+            <!-- Dynamic asset items list will render here -->
+          </div>
+        </div>
+
+      </div>
+
       <!-- ==================== SCREEN 2: REPORTS (דוחות ותקציבים) ==================== -->
       <div id="screen-reports" class="screen-section hidden">
         
@@ -261,6 +302,11 @@
       <div class="nav-item active" data-tab="timeline">
         <i class="bi bi-activity"></i>
         <span>ציר זמן</span>
+      </div>
+
+      <div class="nav-item" data-tab="assets">
+        <i class="bi bi-wallet2"></i>
+        <span>נכסים</span>
       </div>
       
       <!-- Central Action Floating Action Button (FAB) -->
@@ -431,6 +477,38 @@
 
           <div class="modal-footer">
             <button type="submit" class="btn-primary">שמור קטגוריה</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL: ADD/EDIT ASSET ==================== -->
+    <div id="asset-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title" id="asset-modal-title">הוספת נכס חדש</span>
+          <button class="modal-close" id="asset-modal-close"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="asset-form">
+          <input type="hidden" id="asset-edit-id">
+          <div class="form-group">
+            <label for="asset-name">שם הנכס</label>
+            <input type="text" id="asset-name" class="form-input" placeholder="לדוגמא: פנסיה, תיק מניות" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="asset-icon">אייקון (אמוג'י)</label>
+              <input type="text" id="asset-icon" class="form-input" placeholder="לדוגמא: 📈" required style="font-size: 1.25rem; text-align: center;">
+            </div>
+            <div class="form-group">
+              <label for="asset-val">יתרה / שווי (₪)</label>
+              <input type="number" id="asset-val" class="form-input" placeholder="0" min="0" value="0" required>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn-primary">שמור נכס</button>
           </div>
         </form>
       </div>

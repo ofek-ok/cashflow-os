@@ -154,6 +154,7 @@ export const ui = {
 
     // Update screen visibility
     document.getElementById('screen-timeline').classList.toggle('hidden', tabId !== 'timeline');
+    document.getElementById('screen-assets').classList.toggle('hidden', tabId !== 'assets');
     document.getElementById('screen-reports').classList.toggle('hidden', tabId !== 'reports');
     document.getElementById('screen-settings').classList.toggle('hidden', tabId !== 'settings');
 
@@ -375,6 +376,29 @@ export const ui = {
         this.renderReports();
       });
     });
+
+    // Assets Modal Listeners
+    const addAssetBtn = document.getElementById('btn-add-asset');
+    if (addAssetBtn) {
+      addAssetBtn.addEventListener('click', () => {
+        this.openAssetModal();
+      });
+    }
+
+    const assetModalClose = document.getElementById('asset-modal-close');
+    if (assetModalClose) {
+      assetModalClose.addEventListener('click', () => {
+        this.closeAssetModal();
+      });
+    }
+
+    const assetForm = document.getElementById('asset-form');
+    if (assetForm) {
+      assetForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleSaveAsset();
+      });
+    }
   },
 
   // --- Numpad Interaction Engine ---
@@ -593,6 +617,8 @@ export const ui = {
     
     if (state.activeTab === 'timeline') {
       this.renderTimeline();
+    } else if (state.activeTab === 'assets') {
+      this.renderAssets();
     } else if (state.activeTab === 'reports') {
       this.renderReports();
     } else if (state.activeTab === 'settings') {
@@ -999,6 +1025,114 @@ export const ui = {
     });
   },
 
+  // Renders the Assets tab (Total Assets balance, asset allocation stacked bar, list of assets)
+  renderAssets() {
+    // 1. Get Assets and Total Value
+    const assets = db.getAssets();
+    const totalVal = db.getTotalAssetsValue();
+    
+    document.getElementById('total-assets-value').innerText = totalVal.toLocaleString('he-IL', { maximumFractionDigits: 0 });
+    
+    // 2. Render stacked distribution bar
+    const allocationBar = document.getElementById('asset-allocation-bar');
+    const allocationLegend = document.getElementById('asset-allocation-legend');
+    
+    if (allocationBar && allocationLegend) {
+      allocationBar.innerHTML = '';
+      allocationLegend.innerHTML = '';
+      
+      if (totalVal === 0) {
+        allocationBar.innerHTML = `<div style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--text-muted);">אין נכסים להצגה</div>`;
+      } else {
+        const colors = ['#5d5fe6', '#00f0a8', '#ff4a5a', '#00b4d8', '#ff7a00', '#9d4edd', '#ffc107', '#20c997'];
+        
+        assets.forEach((asset, idx) => {
+          const val = parseFloat(asset.value) || 0;
+          if (val > 0) {
+            const pct = Math.round((val / totalVal) * 100);
+            const color = colors[idx % colors.length];
+            
+            // Append bar segment
+            const segment = document.createElement('div');
+            segment.style.height = '100%';
+            segment.style.width = `${pct}%`;
+            segment.style.backgroundColor = color;
+            segment.style.transition = 'width 0.8s ease';
+            if (pct > 8) {
+              segment.innerText = `${pct}%`;
+              segment.style.fontSize = '0.68rem';
+              segment.style.fontWeight = '700';
+              segment.style.color = '#000';
+              segment.style.display = 'flex';
+              segment.style.alignItems = 'center';
+              segment.style.justifyContent = 'center';
+            }
+            allocationBar.appendChild(segment);
+            
+            // Append legend item
+            const legendItem = document.createElement('div');
+            legendItem.style.display = 'flex';
+            legendItem.style.alignItems = 'center';
+            legendItem.style.gap = '6px';
+            legendItem.innerHTML = `
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: ${color};"></span>
+              <span style="font-weight: 500;">${asset.name}</span>
+              <span style="color: var(--text-secondary);">(${pct}%)</span>
+            `;
+            allocationLegend.appendChild(legendItem);
+          }
+        });
+      }
+    }
+    
+    // 3. Render assets list
+    const container = document.getElementById('assets-list-container');
+    if (container) {
+      container.innerHTML = '';
+      
+      if (assets.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px 0;">לא הוגדרו נכסים במערכת</p>`;
+      } else {
+        assets.forEach(asset => {
+          const formattedVal = (parseFloat(asset.value) || 0).toLocaleString('he-IL');
+          const itemEl = document.createElement('div');
+          itemEl.className = 'tx-card slide-up-anim';
+          itemEl.style.cursor = 'pointer';
+          itemEl.innerHTML = `
+            <div class="tx-card-left">
+              <div class="tx-category-icon">${asset.icon || '💼'}</div>
+              <div class="tx-meta">
+                <span class="tx-title">${asset.name}</span>
+                <span class="tx-note">עדכון שווי שוטף</span>
+              </div>
+            </div>
+            <div class="tx-card-right" style="gap: 8px;">
+              <span class="tx-amount" style="color: white; font-family: var(--font-display);">${formattedVal} ₪</span>
+              <button class="tx-delete-btn" data-id="${asset.id}"><i class="bi bi-trash"></i></button>
+            </div>
+          `;
+          
+          // Edit balance click handler
+          itemEl.addEventListener('click', () => {
+            this.openAssetModal(asset);
+          });
+          
+          // Delete asset click handler
+          itemEl.querySelector('.tx-delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm(`האם למחוק את הנכס "${asset.name}"?`)) {
+              db.deleteAsset(asset.id);
+              this.renderAssets();
+              this.showToast('הנכס נמחק');
+            }
+          });
+          
+          container.appendChild(itemEl);
+        });
+      }
+    }
+  },
+
   // Renders Settings list: showing current settings, recurring entries list, and categories list
   renderSettings() {
     const startingCashInput = document.getElementById('setting-starting-cash');
@@ -1274,6 +1408,64 @@ export const ui = {
     this.renderReports();
     this.renderDashboard();
     this.showToast(id ? 'הקטגוריה עודכנה בהצלחה' : 'הקטגוריה נוספה בהצלחה');
+  },
+
+  // --- Manage Assets Modals ---
+  openAssetModal(editAsset = null) {
+    const modal = document.getElementById('asset-modal');
+    const titleEl = document.getElementById('asset-modal-title');
+    const nameInput = document.getElementById('asset-name');
+    const iconInput = document.getElementById('asset-icon');
+    const valInput = document.getElementById('asset-val');
+    const idInput = document.getElementById('asset-edit-id');
+    
+    if (editAsset) {
+      idInput.value = editAsset.id;
+      nameInput.value = editAsset.name;
+      iconInput.value = editAsset.icon;
+      valInput.value = editAsset.value;
+      if (titleEl) titleEl.innerText = 'עדכון שווי נכס';
+    } else {
+      idInput.value = '';
+      nameInput.value = '';
+      iconInput.value = '';
+      valInput.value = '0';
+      if (titleEl) titleEl.innerText = 'הוספת נכס חדש';
+    }
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('open'), 10);
+  },
+
+  closeAssetModal() {
+    const modal = document.getElementById('asset-modal');
+    modal.classList.remove('open');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+    document.getElementById('asset-form').reset();
+  },
+
+  handleSaveAsset() {
+    const id = document.getElementById('asset-edit-id').value;
+    const name = document.getElementById('asset-name').value.trim();
+    const icon = document.getElementById('asset-icon').value.trim();
+    const value = parseFloat(document.getElementById('asset-val').value) || 0;
+    
+    if (!name || !icon) {
+      this.showToast('אנא מלא את שם הנכס והאייקון', true);
+      return;
+    }
+    
+    const asset = {
+      id: id || 'asset_' + Date.now(),
+      name,
+      icon,
+      value
+    };
+    
+    db.saveAsset(asset);
+    this.closeAssetModal();
+    this.renderAssets();
+    this.showToast(id ? 'יתרת הנכס עודכנה בהצלחה' : 'הנכס נוסף בהצלחה');
   },
 
   // --- Notification Toast Helper ---

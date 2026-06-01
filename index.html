@@ -100,16 +100,29 @@
       <!-- ==================== SCREEN 2: REPORTS (דוחות ותקציבים) ==================== -->
       <div id="screen-reports" class="screen-section hidden">
         
+        <!-- Reports Interval Selector Pill Bar -->
+        <div class="glass-card slide-up-anim" style="padding: 10px; margin-bottom: 12px;">
+          <div class="interval-selector" style="display: flex; gap: 4px; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); padding: 4px; border-radius: 12px;">
+            <button class="interval-btn" data-interval="daily">יומית</button>
+            <button class="interval-btn" data-interval="weekly">שבועית</button>
+            <button class="interval-btn active" data-interval="monthly">חודשית</button>
+            <button class="interval-btn" data-interval="quarterly">רבעונית</button>
+            <button class="interval-btn" data-interval="yearly">שנתית</button>
+          </div>
+          <div id="report-date-range-label" style="text-align: center; margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">
+            טווח דוחות: --
+          </div>
+        </div>
 
         <!-- Monthly Net Performance Cards -->
         <div class="reports-grid">
           <div class="summary-cards-container slide-up-anim">
             <div class="mini-card inflow">
-              <span class="mini-card-title">הכנסות חודש זה</span>
+              <span class="mini-card-title">סה"כ הכנסות</span>
               <div id="report-income-val" class="mini-card-value">+0 ₪</div>
             </div>
             <div class="mini-card outflow">
-              <span class="mini-card-title">הוצאות חודש זה</span>
+              <span class="mini-card-title">סה"כ הוצאות</span>
               <div id="report-expense-val" class="mini-card-value">-0 ₪</div>
             </div>
           </div>
@@ -163,7 +176,7 @@
 
           <!-- Budget vs Actual Progress Section -->
           <div class="section-header slide-up-anim" style="margin-top: 10px; margin-bottom: 8px;">
-            <span class="section-title">תקציב מול ביצוע (חודשי)</span>
+            <span class="section-title" id="report-budget-title">תקציב מול ביצוע</span>
           </div>
           <div class="glass-card slide-up-anim">
             <div id="reports-budget-progress-container" class="budget-progress-list">
@@ -185,7 +198,7 @@
         <div class="glass-card settings-section slide-up-anim">
           <div class="settings-row">
             <label for="setting-starting-cash">יתרת פתיחה לחודש בעו"ש</label>
-            <input type="number" id="setting-starting-cash" class="settings-input" value="4500">
+            <input type="number" id="setting-starting-cash" class="settings-input" value="0">
           </div>
         </div>
 

@@ -6,6 +6,7 @@ import { exporter } from './export.js';
 // Application State
 const state = {
   activeTab: 'timeline', // 'timeline' | 'action' (numpad) | 'reports' | 'settings'
+  reportInterval: 'monthly', // 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
   selectedMonth: (() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -22,6 +23,93 @@ const state = {
     includeRecurring: true // Fixed to true as Focus view toggle was removed
   }
 };
+
+// Helper to format date into DD/MM/YYYY
+const formatDateHebrew = (dateStr) => {
+  const parts = dateStr.split('-');
+  return `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`;
+};
+
+// Helper to calculate date range for reports based on active interval
+const getDateRangeForInterval = (selectedMonth, interval) => {
+  const now = new Date();
+  const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  
+  // Set reference date:
+  // If selectedMonth is the current month, use today's date as reference.
+  // Otherwise, use the 1st day of the selectedMonth.
+  let refDate;
+  if (selectedMonth === currMonthStr) {
+    refDate = new Date(now);
+  } else {
+    const [y, m] = selectedMonth.split('-');
+    refDate = new Date(parseInt(y), parseInt(m) - 1, 1);
+  }
+  
+  let startDate, endDate;
+  
+  switch (interval) {
+    case 'daily': {
+      const dateStr = refDate.toISOString().split('T')[0];
+      startDate = dateStr;
+      endDate = dateStr;
+      break;
+    }
+    case 'weekly': {
+      // Week from Sunday to Saturday
+      const dayOfWeek = refDate.getDay(); // 0 (Sun) to 6 (Sat)
+      const start = new Date(refDate);
+      start.setDate(refDate.getDate() - dayOfWeek);
+      const end = new Date(refDate);
+      end.setDate(refDate.getDate() + (6 - dayOfWeek));
+      
+      startDate = start.toISOString().split('T')[0];
+      endDate = end.toISOString().split('T')[0];
+      break;
+    }
+    case 'monthly': {
+      const year = refDate.getFullYear();
+      const month = refDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      
+      startDate = firstDay.toISOString().split('T')[0];
+      endDate = lastDay.toISOString().split('T')[0];
+      break;
+    }
+    case 'quarterly': {
+      const year = refDate.getFullYear();
+      const month = refDate.getMonth();
+      const quarter = Math.floor(month / 3); // 0, 1, 2, 3
+      const firstDay = new Date(year, quarter * 3, 1);
+      const lastDay = new Date(year, (quarter + 1) * 3, 0);
+      
+      startDate = firstDay.toISOString().split('T')[0];
+      endDate = lastDay.toISOString().split('T')[0];
+      break;
+    }
+    case 'yearly': {
+      const year = refDate.getFullYear();
+      const firstDay = new Date(year, 0, 1);
+      const lastDay = new Date(year, 11, 31);
+      
+      startDate = firstDay.toISOString().split('T')[0];
+      endDate = lastDay.toISOString().split('T')[0];
+      break;
+    }
+    default: {
+      const year = refDate.getFullYear();
+      const month = refDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      startDate = firstDay.toISOString().split('T')[0];
+      endDate = lastDay.toISOString().split('T')[0];
+    }
+  }
+  
+  return { startDate, endDate };
+};
+
 
 // Helper to shift YYYY-MM by delta months
 const changeMonth = (monthStr, delta) => {
@@ -277,6 +365,16 @@ export const ui = {
         this.handleSaveCategory();
       });
     }
+
+    // Reports Interval Selector Button Click Handler
+    document.querySelectorAll('.interval-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.interval-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.reportInterval = btn.dataset.interval;
+        this.renderReports();
+      });
+    });
   },
 
   // --- Numpad Interaction Engine ---
@@ -467,7 +565,11 @@ export const ui = {
     
     // Check budget overrun for this category if it is an expense
     if (tx.type === 'expense') {
-      const budgetList = db.getBudgetVsActualForMonth(state.selectedMonth, state.settings.includeRecurring);
+      const [y, m] = state.selectedMonth.split('-');
+      const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+      const startStr = `${state.selectedMonth}-01`;
+      const endStr = `${state.selectedMonth}-${String(lastDay).padStart(2, '0')}`;
+      const budgetList = db.getBudgetVsActualForRange(startStr, endStr, state.settings.includeRecurring);
       const catStatus = budgetList.find(b => b.id === tx.categoryId);
       if (catStatus && catStatus.isOver) {
         this.showToast(`שים לב! חרגת מתקציב קטגוריית ${catStatus.name}!`, true);
@@ -695,6 +797,8 @@ export const ui = {
 
       const amountClass = item.amount > 0 ? 'amount-income' : 'amount-expense';
 
+      const itemEl = document.createElement('div');
+      itemEl.className = 'upcoming-item';
       itemEl.innerHTML = `
         <div class="upcoming-info">
           <div class="upcoming-icon">${cat.icon}</div>
@@ -812,8 +916,17 @@ export const ui = {
 
   // Renders the Reports tab (Total Inflow/Outflow, Budget vs Actual progress bars, Budget Split distribution)
   renderReports() {
-    // 1. Render Summary numbers (Net monthly for selected month)
-    const summary = db.getMonthlySummaryForMonth(state.selectedMonth, state.settings.includeRecurring);
+    // 0. Calculate Date Range for chosen interval
+    const { startDate, endDate } = getDateRangeForInterval(state.selectedMonth, state.reportInterval);
+    
+    // Update date range label
+    const rangeLabel = document.getElementById('report-date-range-label');
+    if (rangeLabel) {
+      rangeLabel.innerText = `טווח דוחות: ${formatDateHebrew(startDate)} - ${formatDateHebrew(endDate)}`;
+    }
+
+    // 1. Render Summary numbers (Net range calculations)
+    const summary = db.getMonthlySummaryForRange(startDate, endDate, state.settings.includeRecurring);
     
     document.getElementById('report-income-val').innerText = `+${summary.income.toLocaleString('he-IL')} ₪`;
     document.getElementById('report-expense-val').innerText = `-${summary.expense.toLocaleString('he-IL')} ₪`;
@@ -823,7 +936,7 @@ export const ui = {
     netEl.className = `mini-card-value ${summary.net >= 0 ? 'amount-income' : 'amount-expense'}`;
 
     // 2. Render Budget Split Distribution (Needs / Wants / Savings)
-    const dist = db.getExpenseDistributionForMonth(state.selectedMonth, state.settings.includeRecurring);
+    const dist = db.getExpenseDistributionForRange(startDate, endDate, state.settings.includeRecurring);
     
     const barNeeds = document.getElementById('split-bar-needs');
     const barWants = document.getElementById('split-bar-wants');
@@ -844,7 +957,7 @@ export const ui = {
     }
 
     // 3. Render Budget progress bars (Budget vs Actual)
-    const budgetList = db.getBudgetVsActualForMonth(state.selectedMonth, state.settings.includeRecurring);
+    const budgetList = db.getBudgetVsActualForRange(startDate, endDate, state.settings.includeRecurring);
     const container = document.getElementById('reports-budget-progress-container');
     if (!container) return;
 

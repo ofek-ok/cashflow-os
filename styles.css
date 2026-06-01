@@ -1420,3 +1420,27 @@ input:checked + .slider:before {
   }
 }
 
+/* Reports Interval Selector */
+.interval-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.interval-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.interval-btn.active {
+  background: var(--primary) !important;
+  color: white !important;
+  box-shadow: 0 0 10px var(--primary-glow);
+}

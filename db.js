@@ -7,7 +7,7 @@ const DB_KEYS = {
   STARTING_CASH: 'cf_starting_cash'
 };
 
-// Default seed categories with financial buckets (Needs, Wants, Savings)
+// Default categories with financial buckets (Needs, Wants, Savings)
 const DEFAULT_CATEGORIES = [
   { id: 'cat_salary', name: 'משכורת', icon: '💰', limit: 0, bucket: 'income' },
   { id: 'cat_rent', name: 'דיור ומשכנתא', icon: '🏠', limit: 4000, bucket: 'needs' },
@@ -21,160 +21,17 @@ const DEFAULT_CATEGORIES = [
   { id: 'cat_general', name: 'כללי', icon: '🏷️', limit: 1000, bucket: 'wants' }
 ];
 
-// Default seed recurring items
-const DEFAULT_RECURRING = [
-  { id: 'rec_salary', name: 'משכורת חודשית', amount: 12500, dayOfMonth: 10, categoryId: 'cat_salary' },
-  { id: 'rec_rent', name: 'שכר דירה', amount: -3800, dayOfMonth: 1, categoryId: 'cat_rent' },
-  { id: 'rec_netflix', name: 'נטפליקס', amount: -60, dayOfMonth: 5, categoryId: 'cat_entertainment' },
-  { id: 'rec_gym', name: 'מנוי כושר', amount: -150, dayOfMonth: 8, categoryId: 'cat_health' },
-  { id: 'rec_internet', name: 'אינטרנט וספק', amount: -110, dayOfMonth: 15, categoryId: 'cat_utilities' },
-  { id: 'rec_savings', name: 'הוראה לקרן השתלמות', amount: -1000, dayOfMonth: 1, categoryId: 'cat_savings' }
-];
-
-// Default seed transactions
-function getSeedTransactions() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  
-  // Set some historical transactions in the previous month (May) to populate it automatically
-  let prevYear = year;
-  let prevMonth = now.getMonth(); // previous month (0-11)
-  if (prevMonth === 0) {
-    prevMonth = 12;
-    prevYear--;
-  }
-  const prevMonthStr = String(prevMonth).padStart(2, '0');
-
-  return [
-    // Current Month (June) Transactions
-    {
-      id: 'tx_1',
-      amount: 12500,
-      date: `${year}-${month}-10`,
-      type: 'income',
-      categoryId: 'cat_salary',
-      note: 'משכורת נכנסה'
-    },
-    {
-      id: 'tx_2',
-      amount: -3800,
-      date: `${year}-${month}-01`,
-      type: 'expense',
-      categoryId: 'cat_rent',
-      note: 'שכירות יוני'
-    },
-    {
-      id: 'tx_savings_1',
-      amount: -1000,
-      date: `${year}-${month}-01`,
-      type: 'expense',
-      categoryId: 'cat_savings',
-      note: 'הפקדה לחיסכון'
-    },
-    {
-      id: 'tx_3',
-      amount: -450,
-      date: `${year}-${month}-02`,
-      type: 'expense',
-      categoryId: 'cat_food',
-      note: 'קנייה גדולה בשופרסל'
-    },
-    {
-      id: 'tx_4',
-      amount: -75,
-      date: `${year}-${month}-05`,
-      type: 'expense',
-      categoryId: 'cat_transport',
-      note: 'תדלוק בתחנת דלק'
-    },
-    {
-      id: 'tx_5',
-      amount: -120,
-      date: `${year}-${month}-12`,
-      type: 'expense',
-      categoryId: 'cat_shopping',
-      note: 'חולצה חדשה'
-    },
-    {
-      id: 'tx_6',
-      amount: -180,
-      date: `${year}-${month}-15`,
-      type: 'expense',
-      categoryId: 'cat_food',
-      note: 'מסעדה עם חברים'
-    },
-    
-    // Previous Month (May) Transactions
-    {
-      id: 'tx_prev_1',
-      amount: 12500,
-      date: `${prevYear}-${prevMonthStr}-10`,
-      type: 'income',
-      categoryId: 'cat_salary',
-      note: 'משכורת נכנסה מאי'
-    },
-    {
-      id: 'tx_prev_2',
-      amount: -3800,
-      date: `${prevYear}-${prevMonthStr}-01`,
-      type: 'expense',
-      categoryId: 'cat_rent',
-      note: 'שכירות מאי'
-    },
-    {
-      id: 'tx_prev_3',
-      amount: -800,
-      date: `${prevYear}-${prevMonthStr}-12`,
-      type: 'expense',
-      categoryId: 'cat_shopping',
-      note: 'קניות בגדים'
-    },
-    {
-      id: 'tx_prev_4',
-      amount: -600,
-      date: `${prevYear}-${prevMonthStr}-18`,
-      type: 'expense',
-      categoryId: 'cat_food',
-      note: 'סופרסל מאי'
-    },
-    {
-      id: 'tx_prev_5',
-      amount: -1000,
-      date: `${prevYear}-${prevMonthStr}-01`,
-      type: 'expense',
-      categoryId: 'cat_savings',
-      note: 'הוראה לחיסכון מאי'
-    }
-  ];
-}
-
 export const db = {
-  // Initialize Database
+  // Initialize Database (Empty system for user data entry)
   init() {
     if (!localStorage.getItem(DB_KEYS.CATEGORIES)) {
       localStorage.setItem(DB_KEYS.CATEGORIES, JSON.stringify(DEFAULT_CATEGORIES));
     }
     if (!localStorage.getItem(DB_KEYS.RECURRING)) {
-      localStorage.setItem(DB_KEYS.RECURRING, JSON.stringify(DEFAULT_RECURRING));
+      localStorage.setItem(DB_KEYS.RECURRING, JSON.stringify([])); // Empty default recurring list
     }
     if (!localStorage.getItem(DB_KEYS.TRANSACTIONS)) {
-      localStorage.setItem(DB_KEYS.TRANSACTIONS, JSON.stringify(getSeedTransactions()));
-    }
-    
-    // Seed starting cash for the previous month (May)
-    const now = new Date();
-    let prevYear = now.getFullYear();
-    let prevMonth = now.getMonth();
-    if (prevMonth === 0) {
-      prevMonth = 12;
-      prevYear--;
-    }
-    const prevMonthStr = `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
-    const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-    if (!localStorage.getItem(`${DB_KEYS.STARTING_CASH}_${prevMonthStr}`)) {
-      localStorage.setItem(`${DB_KEYS.STARTING_CASH}_${prevMonthStr}`, '4000'); // May starting cash
+      localStorage.setItem(DB_KEYS.TRANSACTIONS, JSON.stringify([])); // Empty default transactions list
     }
   },
 
@@ -199,7 +56,7 @@ export const db = {
 
     // Limit recursion to 12 months
     if (depth > 12) {
-      return 4500; // Base default
+      return 0; // Empty system defaults to 0 starting balance
     }
 
     const parts = monthStr.split('-');
@@ -213,7 +70,6 @@ export const db = {
     }
     const prevMonthStr = `${year}-${String(month).padStart(2, '0')}`;
 
-    // Ending Balance of prev month = Starting cash of prev month + net of prev month's transactions
     const prevStarting = this.getStartingCashForMonthRecursive(prevMonthStr, depth + 1);
     
     // Filter manual transactions for prev month
@@ -227,7 +83,7 @@ export const db = {
     localStorage.setItem(`${DB_KEYS.STARTING_CASH}_${monthStr}`, String(amount));
   },
 
-  // Legacy fallback method (interface compatibility)
+  // Legacy fallback
   getStartingCash() {
     const now = new Date();
     const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -304,11 +160,43 @@ export const db = {
     localStorage.setItem(DB_KEYS.TRANSACTIONS, JSON.stringify(txs));
   },
 
-  // --- Core Financial Calculators (Refactored for Monthly Ledger) ---
+  // --- Core Financial Calculators (Range-Based for Intervals) ---
+
+  /**
+   * Helper to retrieve all instances of recurring transactions within a specific date range
+   */
+  getRecurringEventsInRange(startDate, endDate) {
+    const events = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const recurring = this.getRecurring();
+    
+    // Loop month-by-month from start to end
+    let current = new Date(start.getFullYear(), start.getMonth(), 1);
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = current.getMonth() + 1; // 1-12
+      
+      recurring.forEach(item => {
+        const day = Math.min(item.dayOfMonth, new Date(year, month, 0).getDate());
+        const eventDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        if (eventDateStr >= startDate && eventDateStr <= endDate) {
+          events.push({
+            ...item,
+            date: eventDateStr
+          });
+        }
+      });
+      
+      current.setMonth(current.getMonth() + 1);
+    }
+    return events;
+  },
 
   /**
    * Computes actual cash balance at the end of the specified month
-   * (or up to today's date if it's the current month).
    */
   getCurrentCashForMonth(monthStr) {
     const startingCash = this.getStartingCashForMonth(monthStr);
@@ -319,7 +207,6 @@ export const db = {
     
     let performedTxs = txs;
     if (monthStr === currMonthStr) {
-      // Filter transactions up to today
       const todayStr = now.toISOString().split('T')[0];
       performedTxs = txs.filter(t => t.date <= todayStr);
     }
@@ -335,17 +222,14 @@ export const db = {
   },
 
   /**
-   * Calculates the projected balance at the end of the month.
+   * Calculates the projected balance at the end of the month
    */
   getProjectedBalanceForMonth(monthStr) {
     const currentCash = this.getCurrentCashForMonth(monthStr);
-    
     const now = new Date();
     const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     
-    // Projections are only meaningful for the current month and future months
     if (monthStr < currMonthStr) {
-      // For past months, ending projected balance = ending actual balance
       const txs = this.getTransactions().filter(t => t.date.startsWith(monthStr));
       const startingCash = this.getStartingCashForMonth(monthStr);
       return startingCash + txs.reduce((sum, t) => sum + t.amount, 0);
@@ -360,7 +244,6 @@ export const db = {
 
     let recurringNet = 0;
     recurring.forEach(item => {
-      // Sum recurring items scheduled after "todayDom"
       if (item.dayOfMonth > todayDom && item.dayOfMonth <= lastDayOfMonth) {
         recurringNet += item.amount;
       }
@@ -376,7 +259,7 @@ export const db = {
   },
 
   /**
-   * Generates a balance projection mapping days of the targeted month.
+   * Generates a daily balance timeline for the month
    */
   get30DayProjectionForMonth(monthStr) {
     const points = [];
@@ -387,9 +270,7 @@ export const db = {
     const year = parseInt(parts[0]);
     const month = parseInt(parts[1]);
     
-    // Get number of days in this targeted month
     const totalDays = new Date(year, month, 0).getDate();
-    
     const startingCash = this.getStartingCashForMonth(monthStr);
     const txs = this.getTransactions().filter(t => t.date.startsWith(monthStr));
     const recurring = this.getRecurring();
@@ -399,14 +280,10 @@ export const db = {
     for (let d = 1; d <= totalDays; d++) {
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       
-      // Calculate changes on this day
-      // 1. Manual actual transactions
       const dayTxs = txs.filter(t => t.date === dateStr);
       const dayTxsNet = dayTxs.reduce((sum, t) => sum + t.amount, 0);
-      
       runningBalance += dayTxsNet;
 
-      // 2. Future recurring transactions (only added for current/future dates)
       const isFuture = monthStr > currMonthStr || (monthStr === currMonthStr && d > now.getDate());
       if (isFuture) {
         const dayRecurring = recurring.filter(r => r.dayOfMonth === d);
@@ -432,89 +309,74 @@ export const db = {
   },
 
   /**
-   * Returns category limits vs actual spending for the specified month.
+   * Calculates financial performance totals within a custom date range
    */
-  getBudgetVsActualForMonth(monthStr, includeRecurring = true) {
-    const categories = this.getCategories();
+  getMonthlySummaryForRange(startDate, endDate, includeRecurring = true) {
     const txs = this.getTransactions();
-    const recurring = this.getRecurring();
     
-    const parts = monthStr.split('-');
-    const year = parseInt(parts[0]);
-    const month = parseInt(parts[1]);
-    
-    const startOfMonthStr = new Date(year, month - 1, 1).toISOString().split('T')[0];
-    const endOfMonthStr = new Date(year, month, 0).toISOString().split('T')[0];
+    // Filter manual transactions in range
+    const rangeTxs = txs.filter(t => t.date >= startDate && t.date <= endDate);
+    let totalIncome = rangeTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    let totalExpense = Math.abs(rangeTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0));
 
-    return categories.map(cat => {
-      // 1. Performed manual transactions this month
-      const catTxs = txs.filter(t => 
-        t.categoryId === cat.id && 
-        t.date.startsWith(monthStr) &&
-        t.type === 'expense'
-      );
-      const actualSpent = Math.abs(catTxs.reduce((sum, t) => sum + t.amount, 0));
+    // Process recurring items in range
+    if (includeRecurring) {
+      const rangeRecurring = this.getRecurringEventsInRange(startDate, endDate);
+      rangeRecurring.forEach(item => {
+        if (item.amount > 0) {
+          totalIncome += item.amount;
+        } else {
+          totalExpense += Math.abs(item.amount);
+        }
+      });
+    }
 
-      // 2. Recurring items (if applicable)
-      let recurringSpent = 0;
-      if (includeRecurring) {
-        const catRecur = recurring.filter(r => r.categoryId === cat.id && r.amount < 0);
-        recurringSpent = Math.abs(catRecur.reduce((sum, r) => sum + r.amount, 0));
-      }
-
-      const totalSpent = actualSpent + recurringSpent;
-
-      return {
-        id: cat.id,
-        name: cat.name,
-        icon: cat.icon,
-        limit: cat.limit,
-        actual: totalSpent,
-        isOver: cat.limit > 0 && totalSpent > cat.limit,
-        percentage: cat.limit > 0 ? Math.round((totalSpent / cat.limit) * 100) : 0
-      };
-    });
+    return {
+      income: totalIncome,
+      expense: totalExpense,
+      net: totalIncome - totalExpense
+    };
   },
 
-  getBudgetVsActual(includeRecurring = true) {
+  getMonthlySummary(includeRecurring = true) {
     const now = new Date();
-    const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    return this.getBudgetVsActualForMonth(currMonthStr, includeRecurring);
+    const startStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const endStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return this.getMonthlySummaryForRange(startStr, endStr, includeRecurring);
   },
 
   /**
-   * Calculates total spending grouped by financial buckets for the specified month.
+   * Returns spending metrics grouped by category buckets within a custom date range
    */
-  getExpenseDistributionForMonth(monthStr, includeRecurring = true) {
+  getExpenseDistributionForRange(startDate, endDate, includeRecurring = true) {
     const categories = this.getCategories();
     const txs = this.getTransactions();
-    const recurring = this.getRecurring();
 
-    // Initialize buckets
     const distribution = {
       needs: 0,
       wants: 0,
       savings: 0
     };
 
-    // Create category bucket lookup
     const catBuckets = {};
     categories.forEach(c => {
       catBuckets[c.id] = c.bucket || 'wants';
     });
 
     // 1. Process manual transactions
-    const monthTxs = txs.filter(t => t.date.startsWith(monthStr) && t.type === 'expense');
-    monthTxs.forEach(t => {
+    const rangeTxs = txs.filter(t => t.date >= startDate && t.date <= endDate && t.type === 'expense');
+    rangeTxs.forEach(t => {
       const bucket = catBuckets[t.categoryId];
       if (bucket && distribution[bucket] !== undefined) {
         distribution[bucket] += Math.abs(t.amount);
       }
     });
 
-    // 2. Process recurring expenses
+    // 2. Process recurring transactions in range
     if (includeRecurring) {
-      recurring.forEach(item => {
+      const rangeRecurring = this.getRecurringEventsInRange(startDate, endDate);
+      rangeRecurring.forEach(item => {
         if (item.amount < 0) {
           const bucket = catBuckets[item.categoryId];
           if (bucket && distribution[bucket] !== undefined) {
@@ -541,8 +403,65 @@ export const db = {
 
   getExpenseDistribution(includeRecurring = true) {
     const now = new Date();
-    const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    return this.getExpenseDistributionForMonth(currMonthStr, includeRecurring);
+    const startStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const endStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return this.getExpenseDistributionForRange(startStr, endStr, includeRecurring);
+  },
+
+  /**
+   * Returns category limits vs actual spending within a custom date range
+   */
+  getBudgetVsActualForRange(startDate, endDate, includeRecurring = true) {
+    const categories = this.getCategories();
+    const txs = this.getTransactions();
+    
+    // Calculate range scaling factor relative to a 30-day month
+    const d1 = new Date(startDate);
+    const d2 = new Date(endDate);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    const scaleFactor = diffDays / 30;
+
+    return categories.map(cat => {
+      // 1. Performed manual transactions in range
+      const catTxs = txs.filter(t => 
+        t.categoryId === cat.id && 
+        t.date >= startDate && 
+        t.date <= endDate &&
+        t.type === 'expense'
+      );
+      const actualSpent = Math.abs(catTxs.reduce((sum, t) => sum + t.amount, 0));
+
+      // 2. Recurring items in range
+      let recurringSpent = 0;
+      if (includeRecurring) {
+        const rangeRecurring = this.getRecurringEventsInRange(startDate, endDate);
+        const catRecur = rangeRecurring.filter(r => r.categoryId === cat.id && r.amount < 0);
+        recurringSpent = Math.abs(catRecur.reduce((sum, r) => sum + r.amount, 0));
+      }
+
+      const totalSpent = actualSpent + recurringSpent;
+      const scaledLimit = Math.round(cat.limit * scaleFactor);
+
+      return {
+        id: cat.id,
+        name: cat.name,
+        icon: cat.icon,
+        limit: scaledLimit,
+        actual: totalSpent,
+        isOver: scaledLimit > 0 && totalSpent > scaledLimit,
+        percentage: scaledLimit > 0 ? Math.round((totalSpent / scaledLimit) * 100) : 0
+      };
+    });
+  },
+
+  getBudgetVsActual(includeRecurring = true) {
+    const now = new Date();
+    const startStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const endStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    return this.getBudgetVsActualForRange(startStr, endStr, includeRecurring);
   },
 
   /**
@@ -568,47 +487,13 @@ export const db = {
     return mapped.sort((a, b) => a.daysRemaining - b.daysRemaining).slice(0, limit);
   },
 
-  /**
-   * Returns monthly summary for the targeted month
-   */
-  getMonthlySummaryForMonth(monthStr, includeRecurring = true) {
-    const txs = this.getTransactions();
-    const recurring = this.getRecurring();
-
-    const monthTxs = txs.filter(t => t.date.startsWith(monthStr));
-    let totalIncome = monthTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-    let totalExpense = Math.abs(monthTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0));
-
-    if (includeRecurring) {
-      recurring.forEach(item => {
-        if (item.amount > 0) {
-          totalIncome += item.amount;
-        } else {
-          totalExpense += Math.abs(item.amount);
-        }
-      });
-    }
-
-    return {
-      income: totalIncome,
-      expense: totalExpense,
-      net: totalIncome - totalExpense
-    };
-  },
-
-  getMonthlySummary(includeRecurring = true) {
-    const now = new Date();
-    const currMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    return this.getMonthlySummaryForMonth(currMonthStr, includeRecurring);
-  },
-
-  // Reset database
+  // Reset database to default empty state
   resetAll() {
     localStorage.removeItem(DB_KEYS.CATEGORIES);
     localStorage.removeItem(DB_KEYS.TRANSACTIONS);
     localStorage.removeItem(DB_KEYS.RECURRING);
     
-    // Clear starting cash keys
+    // Clear all starting cash keys
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith(DB_KEYS.STARTING_CASH)) {
         localStorage.removeItem(key);
